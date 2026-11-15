@@ -527,7 +527,7 @@ industries = beta_df["Industry"].tolist()
 
 # ---- Sidebar ----------------------------------------------------------------------
 with st.sidebar:
-    if st.button("🔄 Refresh market data", use_container_width=True,
+    if st.button("🔄 Refresh market data", width="stretch",
                  help="Fetch the newest betas, spreads, tax rates and bond yields."):
         st.cache_data.clear()
         st.rerun()
@@ -652,7 +652,7 @@ with tabs[0]:
         show = res_df.copy()
         for c in show.columns[1:]:
             show[c] = show[c].map(lambda x: pct(x, 4))
-        st.dataframe(show, hide_index=True, use_container_width=True)
+        st.dataframe(show, hide_index=True, width="stretch")
         st.caption(f"Project tax rate: {pct(tau)} ({tax_choice}). Debt share {pct(d, 0)}, "
                    f"equity risk premium {pct(erp, 1)}. Levered beta {res['beta_e']:.4f}.")
     with right:
@@ -675,7 +675,7 @@ with tabs[0]:
         )
         bars = base.mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
         labels = base.mark_text(dy=-8, fontSize=12).encode(text="Label:N", color=alt.value("#52514e"))
-        st.altair_chart((bars + labels).properties(height=320), use_container_width=True)
+        st.altair_chart((bars + labels).properties(height=320), width="stretch")
 
     inputs_df = pd.DataFrame([
         ("Industry", industry, ""), ("Country", country, ""),
@@ -699,12 +699,12 @@ with tabs[0]:
     d1.download_button("⬇️ Download results (Excel)", buf.getvalue(),
                        file_name=f"cost_of_capital_{slug}_{dt.date.today()}.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                       use_container_width=True)
+                       width="stretch")
     d2.download_button("⬇️ Download results (CSV)",
                        pd.concat([res_df.rename(columns={"Measure": "Item"}),
                                   inputs_df.rename(columns={"Input": "Item"})]).to_csv(index=False),
                        file_name=f"cost_of_capital_{slug}_{dt.date.today()}.csv", mime="text/csv",
-                       use_container_width=True)
+                       width="stretch")
 
 # ---- Step-by-step tab ------------------------------------------------------------------
 with tabs[1]:
@@ -761,21 +761,21 @@ with tabs[2]:
     ).properties(height=max(400, 17 * len(all_df)))
     g1, g2 = st.columns([1.15, 1])
     with g1:
-        st.altair_chart(bar, use_container_width=True)
+        st.altair_chart(bar, width="stretch")
     with g2:
         fmt = {c: st.column_config.NumberColumn(c, format="%.2f%%") for c in all_df.columns
                if c.startswith(("Cost", "WACC"))}
         disp = all_df.drop(columns=["Selected"]).copy()
         for c in fmt:
             disp[c] = disp[c] * 100
-        st.dataframe(disp, hide_index=True, use_container_width=True, height=900,
+        st.dataframe(disp, hide_index=True, width="stretch", height=900,
                      column_config={**fmt,
                                     "Unlevered beta": st.column_config.NumberColumn(format="%.2f"),
                                     "Levered beta": st.column_config.NumberColumn(format="%.2f")})
         st.download_button("⬇️ Download all industries (CSV)",
                            all_df.drop(columns=["Selected"]).to_csv(index=False),
                            file_name=f"all_industries_{slug}_{dt.date.today()}.csv", mime="text/csv",
-                           use_container_width=True)
+                           width="stretch")
 
 # ---- Data & sources tab -------------------------------------------------------------
 with tabs[3]:
