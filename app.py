@@ -416,7 +416,7 @@ st.markdown(
 .card td {{padding: .25rem 0; border: none;}}
 .card td.v {{text-align: right; font-weight: 600;}}
 .pill {{display:inline-block; padding: .1rem .55rem; border-radius: 999px; font-size: .78rem;
-        font-weight: 600; margin-left: .3rem;}}
+        font-weight: 600; margin-left: .3rem; white-space: nowrap;}}
 .live {{background:#dff5e1; color:#11631b;}}
 .snap {{background:#fff1d6; color:#7a4b00;}}
 .man {{background:#e6e3fb; color:#3b2ea3;}}
@@ -624,11 +624,12 @@ if same_ccy:
                 unsafe_allow_html=True)
 else:
     direction = "lose" if res["dep"] > 0 else "gain"
+    hl = "higher" if res["dep"] > 0 else "lower"
     st.markdown(
         f'<div class="note"><b>Why the numbers differ:</b> {country}\'s 10-year bond pays '
         f'{pct(rf_fx)} versus {pct(rf_us)} in the U.S. Markets read that gap as the {ccy} expected to '
         f'{direction} about <b>{pct(abs(res["dep"]))} per year</b> against the dollar, so returns in '
-        f'{ccy} must be higher (or lower) by that amount to be worth the same in dollars. '
+        f'{ccy} must be {hl} by that amount to be worth the same in dollars. '
         f'Same project, same risk, different measuring stick.</div>',
         unsafe_allow_html=True)
 
@@ -751,14 +752,14 @@ with tabs[2]:
     all_df = all_df.sort_values(metric, ascending=False)
     all_df["Selected"] = np.where(all_df["Industry"] == industry, "Your industry", "Other")
     bar = alt.Chart(all_df).mark_bar(cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
-        y=alt.Y("Industry:N", sort="-x", title=None, axis=alt.Axis(labelLimit=260)),
+        y=alt.Y("Industry:N", sort="-x", title=None, axis=alt.Axis(labelLimit=260, labelOverlap=False, labelFontSize=11)),
         x=alt.X(f"{metric}:Q", axis=alt.Axis(format="%", orient="top", gridOpacity=0.3), title=metric),
         color=alt.Color("Selected:N", scale=alt.Scale(domain=["Your industry", "Other"],
                                                       range=[FX_COLOR, USD_COLOR]),
                         legend=alt.Legend(orient="top", title=None)),
         tooltip=["Industry", alt.Tooltip("Unlevered beta:Q", format=".2f"),
                  alt.Tooltip(f"{metric}:Q", format=".2%")],
-    ).properties(height=max(400, 17 * len(all_df)))
+    ).properties(height=max(400, 18 * len(all_df)))
     g1, g2 = st.columns([1.15, 1])
     with g1:
         st.altair_chart(bar, width="stretch")
